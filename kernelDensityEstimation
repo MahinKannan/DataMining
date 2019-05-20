@@ -1,0 +1,124 @@
+import numpy as np
+import os
+import matplotlib.pyplot as plt 
+
+inp=int(input("Enter '1' for 1D Gaussian data or '2' for 2D data: "))
+if inp==1:
+	u1=5
+	std1=1
+	X = np.random.normal(u1, std1, 1000).T
+	#ext = np.random.normal(0, 0.2, 1000).T   #For Question 3
+	#X=np.append(X,ext)
+
+elif inp==2:
+	u1=np.float32([1,0])
+	u2=np.float32([0,1.5])
+	cov1=np.float32([[0.9,0.4],[0.4,0.9]])
+	cov2=np.float32([[0.9,0.4],[0.4,0.9]])
+
+	x1, y1 = np.random.multivariate_normal(u1, cov1, 500).T
+	x2, y2 = np.random.multivariate_normal(u2, cov2, 500).T
+	
+	x=np.concatenate((x1,x2))
+	y=np.concatenate((y1,y1))
+#plt.scatter(x, y, label= "stars", color= "green",marker= "*", s=30)  
+#plt.show()
+	x=x[np.newaxis]
+	y=y[np.newaxis]
+
+	X=np.concatenate((x,y),axis=0).T
+	#print(x)
+else:
+	print("Only 1 or 2")
+	exit()
+os.system("clear")
+
+h=float(input("Enter value for h (bin size [.1,1,5,10]):"))
+
+def mykde(X,h):
+	x,step=np.linspace(-5,5,num=1000,retstep=True)  #For 1000 num, step is 0.01
+	y,step=np.linspace(-5,5,num=1000,retstep=True)
+	#print(x,step)
+	d=X.ndim
+	#print("Dim=",X.ndim)
+
+	if d==1:								#for 1D
+			px=[]
+			for i in range(len(x)):			#loop for each x
+				summ=0
+				for j in range(len(X)):		#loop for each of the generated Gaussian data point
+					k=(x[i]-X[j])/h
+					if abs(k)<=0.5:
+						k=1
+					else:
+						k=0
+					summ=summ+k*(1/h**d)
+				final=summ/len(X)
+				px.append(final)
+			return px,x
+			
+	elif d==2:								#for 2D
+			px=[]
+			py=[]
+			for i in range(len(x)):
+				
+				sumx=0
+				sumy=0
+				for j in range(len(X)):
+					ky=(y[i]-X[j][1])/h
+					kx=(x[i]-X[j][0])/h
+					if abs(kx)<=0.5:
+						kx=1
+					else:
+						kx=0
+					if abs(ky)<=0.5:
+						ky=1
+					else:
+						ky=0
+					sumx=sumx+kx*(1/h**d)
+					sumy=sumy+ky*(1/h**d)
+
+				finalx=sumx/len(X)
+				finaly=sumy/len(X)
+				px.append(finalx)
+				py.append(finaly)
+		#	print(len(px))
+			c=list(set(zip(px,py)))
+			#print(c)
+			plt.xlabel('px ') 
+			# naming the y axis 
+			plt.ylabel('py ') 
+			plt.scatter(px, py, color= "green",marker= "*",label="px-py") 
+			
+			plt.legend()
+			plt.show()
+			plt.clf()
+			plt.plot(x,px,color="red",label="x-px")
+			plt.plot(y,py,color="blue", label="y-py")
+			plt.xlabel('x/y ') 
+			# naming the y axis 
+			plt.ylabel('px/py ') 
+			plt.legend()
+
+			plt.show()
+			exit()
+			#return px,list(set(zip(x,y)))
+	else:
+		print("Only 1 or 2")
+		exit()
+
+#p,x= 
+px, x= mykde(X,h)
+#print(x)
+#print("_________________________")
+#print(px)
+axes = plt.gca()
+axes.set_ylim([0,max(px)])
+#axes.set_xlim([-.4,.4])
+plt.xlabel('discritized x ') 
+# naming the y axis 
+plt.ylabel('px')
+plt.bar(x,px) 
+#plt.hist(px,bins=x)#,rwidth=h)
+plt.show()
+
