@@ -22,7 +22,7 @@ Then,
 Enter the values asked in the command prompt
 
 Number of clusters: n
-Define center values: yes (If you want to enter custom center coordinates), no  (If you want random centers)
+Define center values: yes (If you want to enter custom center coordinates) or  no  (If you want random centers)
 
 If you chose yes, enter the x and y values of the centers separated by a space for a center and hit enter.
 
