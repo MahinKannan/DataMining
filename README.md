@@ -22,8 +22,7 @@ Then,
 Enter the values asked in the command prompt
 
 Number of clusters: n
-Define center values: yes (If you want to enter custom center coordinates)
-......................no  (If you want random centers)
+Define center values: yes (If you want to enter custom center coordinates), no  (If you want random centers)
 
 If you chose yes, enter the x and y values of the centers separated by a space for a center and hit enter.
 
@@ -39,8 +38,7 @@ python [pname].py
 Then,
 Enter the values asked
 
-Enter '1' for 1D Gaussian data or '2' for 2D data: 1 (for 1D Gaussian data)
-...................................................2 (for 2D Gaussion data)	
+Enter '1' for 1D Gaussian data or '2' for 2D data: 1 (for 1D Gaussian data) or 2 (for 2D Gaussion data)	
 Enter value for h: h (binsize)
 _______________________________________________________________________________
 Running Naive Bayes 
@@ -49,10 +47,9 @@ python [pname].py
 _______________________________________________________________________________
 Running logistic regression
 
-For batch training
-	python [pname].py batch
-___
-For online
-	python [pname].py online
+For batch training,  python [pname].py batch
+
+
+For online,  python [pname].py online
 
 
