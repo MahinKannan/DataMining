@@ -1,2 +1,2 @@
-# DataMining
-Algorithm implementations of popular data mining algorithms. (Contains bugs)
+1. K-means
+2. 
