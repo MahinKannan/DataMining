@@ -1,0 +1,175 @@
+import numpy as np
+import os
+import matplotlib.pyplot as plt 
+import math
+import sys
+#np.random.seed(1444)
+def sigmoid(x):
+	k=lambda l:1/(1+np.exp(-l))
+	s=k(x)
+	return s
+u1=np.float32([1,0])
+u2=np.float32([0,1.5])
+cov1=np.float32([[1,0.75],[0.75,1]])
+cov2=np.float32([[1,0.75],[0.75,1]])
+
+c=[0,1]
+
+
+x1, y1 = np.random.multivariate_normal(u1, cov1, 500).T
+x2, y2 = np.random.multivariate_normal(u2, cov2, 500).T
+x=np.concatenate((x1,x2))
+y=np.concatenate((y1,y2))
+x=x[np.newaxis]
+y=y[np.newaxis]
+X=np.concatenate((x,y),axis=0).T
+Y=np.repeat(c,500)[np.newaxis].T
+
+
+x1, y1 = np.random.multivariate_normal(u1, cov1, 500).T
+x2, y2 = np.random.multivariate_normal(u2, cov2, 500).T
+x=np.concatenate((x1,x2))
+y=np.concatenate((y1,y2))
+x=x[np.newaxis]
+y=y[np.newaxis]
+X_test=np.concatenate((x,y),axis=0).T
+Y_test=np.repeat(c,500)
+
+
+b=1
+w=np.random.rand(2)[np.newaxis].T
+###########################################################################################
+
+lr=1	# [1,0.1,0.01,0.001]			#########Learning rate here!!!!!!!!!!!!!!!!!!!!!!##################
+
+#################################################################################################
+
+counter=0
+ex=0
+#print(w)
+holder=[]
+hol=[]
+
+typ=sys.argv[1]
+
+if typ=='batch':
+
+	while True:
+		ex+=1
+		loss=0
+		net=np.dot(X,w)+b
+		o=sigmoid(net)
+		loss=-np.sum(Y*np.log(o+1e-7)+(1-Y)*np.log(1-o+1e-7))
+		loss/=1000
+		#print(loss.shape)
+		#for i in range((loss.shape[0])):
+		holder.append(loss)
+		grad=np.multiply(o-Y,X)
+		grad=grad.sum(axis=0)[np.newaxis]
+		grad=(grad/X.shape[0]).T
+		hol.append(np.sum(abs(grad)))
+		w=w-lr*grad
+		b=b-lr*sum(grad)
+		
+		counter+=1
+		if np.sum(abs(grad))<0.001 or counter>100000:
+			#print(grad)
+			#print(b)
+			break
+
+	print(f"Counter={counter}")
+	print(f"New Weights:\n{w}")
+
+else:
+	run=True
+	ex=0
+	inn=0
+	while run:
+		inn=0
+		
+		for row, yval in zip(X,Y) :
+			inn+=1
+			ex+=1
+			net=np.dot(row,w)+b
+			o=sigmoid(net)
+			loss=-np.sum(yval*np.log(o+1e-7)+(1-yval)*np.log(1-o+1e-7))
+		
+			grad=np.multiply(o-yval,row)
+			holder.append(loss)
+			hol.append(np.sum(abs(grad)))
+			w=w-lr*(grad[np.newaxis].T)
+			b=b-lr*(sum(grad))
+			
+			if np.sum(abs(grad))<0.001 :
+				#print(grad)
+				run=False;break
+		#print(grad)
+		counter+=1
+		
+		if counter>100000:
+			#print(grad)
+			#print(b)
+			run=False;break
+			
+		#g=input('D')
+	print(f"Counter={counter}")
+	print(f"Inner count={inn}")
+
+	print(f"Total iterations={ex}")
+
+
+
+k=sigmoid(np.dot(X_test,w)+b)
+for i in range(len(k)):
+	if k[i]>=0.5:
+		k[i]=1
+		
+	else:
+		
+		k[i]=0
+
+
+tp=0
+tn=0
+fp=0
+fn=0
+
+for i in range(Y_test.shape[0]):
+	if k[i]==0 and Y_test[i]==0:
+		tp+=1
+	elif k[i]==1 and Y_test[i]==1:
+		tn+=1
+	elif k[i]==0 and Y_test[i]==1:
+		fp+=1
+	else:
+		fn+=1
+
+
+acc=(tp+tn)/(tp+tn+fp+fn)
+print(f"Accuracy={acc}")
+
+
+
+#inn+=1
+
+#exit()
+
+plt.scatter(X_test[Y_test==0,0], X_test[Y_test==0,1], color= "green",marker= "*", s=30,label="Test data Class 0")  
+plt.scatter(X_test[Y_test==1,0], X_test[Y_test==1,1], color= "blue",marker= "+", s=30,label="Test data Class 1")  
+plt.legend()
+#line=((b*X)/w[0])-(w[1]/w[0])
+
+linex=[[min(X_test[:,0]),max(X_test[:,1])]]
+#linex=linex.astype(np.float32)
+liney=-(b+np.multiply(w[0],linex))/w[1]
+#print(linex)
+#print(liney)
+#plt.plot(X_test,line,'r-')
+plt.plot([linex[0][0],linex[0][1]],[liney[0][0],liney[0][1]])
+plt.show()
+#print(holder)
+plt.plot(range(ex),holder)
+plt.show()
+
+plt.plot(range(ex),hol)
+plt.show()
