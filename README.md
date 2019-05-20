@@ -51,10 +51,8 @@ Running logistic regression
 
 For batch training
 	python [pname].py batch
+___
 For online
 	python [pname].py online
-
-
-To change learning rate, open code and change it.
 
 
