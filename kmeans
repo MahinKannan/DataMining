@@ -1,111 +1,107 @@
 import numpy as np
 import os
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 
-#from sklearn.cluster import KMeans
-
-
-#np.random.seed(1234)
-u1=np.float32([1,0])
-u2=np.float32([0,1.5])
-cov1=np.float32([[0.9,0.4],[0.4,0.9]])
-cov2=np.float32([[0.9,0.4],[0.4,0.9]])
+#mean and covariance
+u1 = np.float32([1, 0])
+u2 = np.float32([0, 1.5])
+cov1 = np.float32([[0.9, 0.4],[0.4, 0.9]])
+cov2 = np.float32([[0.9, 0.4],[0.4, 0.9]])
 
 x1, y1 = np.random.multivariate_normal(u1, cov1, 500).T
 x2, y2 = np.random.multivariate_normal(u2, cov2, 500).T
-x=np.concatenate((x1,x2))
-y=np.concatenate((y1,y2))
+#Create one 2D list of 1000 points
+x = np.concatenate((x1, x2))
+y = np.concatenate((y1, y2))
+
 plt.xlabel('x - axis') 
-# naming the y axis 
 plt.ylabel('y - axis') 
-plt.scatter(x, y, color= "green",marker= "*", s=30,label="Generated data")  
+plt.scatter(x, y, color = "green", marker = "*", s = 30, label = "Generated data")  
 #plt.show()
-x=x[np.newaxis]
-y=y[np.newaxis]
+x = x[np.newaxis]
+y = y[np.newaxis]
 
-X=np.concatenate((x,y),axis=0).T
+#Holds the (x, y)
+X = np.concatenate((x, y), axis = 0).T
 os.system('clear')
-#print(X)
 
-#kmeans = KMeans(n_clusters=4, random_state=0).fit(X)
-#print(kmeans.cluster_centers_)
-
-
-def mykmeans(X,k,c=0):
-	exi=0							 #exit loop if l2 norm of updated center and previous center is <=0.001
-	hol=0						#Holds minimum distance from point to a cluster center
-	tem=np.empty([k,2])			 #Initial cluster center before iteration
+def mykmeans(X, k, c = 0):
+	"""
+		k = number of clusters
+		c = center values
+		X is the points list we create above
+	"""
+	exit_flag = 0
+	min_dist_point_to_clustCent = 0
+	initial_center = np.empty([k, 2])
 	if not np.any(c):
 		for i in range(k):		#initialize center if not given by user
-			tem[i][0]=np.random.randn()
-			tem[i][1]=np.random.randn()
-
+			initial_center[i][0] = np.random.randn()
+			initial_center[i][1] = np.random.randn()
 	else:
-		tem=c
-		
+		initial_center = c
 	print("\nInitial cluster centers:")
 	for i in range(k):
-		print(f"Cluster {i+1} center: x={tem[i][0]}  y={tem[i][1]}")
-	for iter in range(10000):		 #main loop for k means
-		hol=0
-		w,h=len(tem),len(X)
-		dis=np.empty([h,w])
+		print(f"Cluster {i + 1} center: x = {initial_center[i][0]} y = {initial_center[i][1]}")
+	for iteration in range(10000):
+		min_dist_point_to_clustCent = 0
+		w, h = len(initial_center), len(X)
+		distance_matrix = np.empty([h, w])
 		for i in range(h):
-			for j in range(w):							#calculate distance between centers and points
-				dis[i][j]=np.sqrt((X[i][0]-tem[j][0])**2+(X[i][1]-tem[j][1])**2)
-			hol=np.float32(np.where(dis[i]==min(dis[i])))       #get the closest cluster to the point
-			hol=hol.item()
+			for j in range(w):		#calculate distance between centers and points
+				distance_matrix[i][j] = np.sqrt((X[i][0] - initial_center[j][0])**2 
+					+ (X[i][1] - initial_center[j][1])**2)
+
+			#get the closest cluster to the point
+			min_dist_point_to_clustCent = np.float32(np.where(distance_matrix[i] 
+				== min(distance_matrix[i])))       
+			min_dist_point_to_clustCent = min_dist_point_to_clustCent.item()
 			for j in range(w):
-				if hol!=j:
-					dis[i][j]=0
-		cc=np.zeros([k,2])
-		cnt=np.zeros(k)
+				if min_dist_point_to_clustCent != j:
+					distance_matrix[i][j] = 0
+		cluster_center = np.zeros([k, 2])
+		count_for_each_center_to_normalize = np.zeros(k)
 
-		for i in range(len(dis)):                  #calculate mean among all clusters for the update process
-			for j in range(len(tem)):
-				if dis[i][j]!=0:
-					cc[j][0]=cc[j][0]+X[i][0]
-					cc[j][1]=cc[j][1]+X[i][1]
-					cnt[j]+=1
+		#calculate mean among all clusters for the update process
+		for i in range(len(distance_matrix)):                  
+			for j in range(len(initial_center)):
+				if distance_matrix[i][j] != 0:
+					cluster_center[j][0] = cluster_center[j][0] + X[i][0]
+					cluster_center[j][1] = cluster_center[j][1] + X[i][1]
+					count_for_each_center_to_normalize[j] += 1
 		for i in range(k):
-			cc[i]=cc[i]/cnt[i]
-		for i in range(len(tem)):						#check for exit condition
-			n0=np.absolute(np.linalg.norm(tem[i])-np.linalg.norm(cc[i]))
-			if n0<=0.001:
-				exi=1
+			cluster_center[i] = cluster_center[i] / count_for_each_center_to_normalize[i]
+		for i in range(len(initial_center)):		#check for exit condition
+			n0 = np.absolute(np.linalg.norm(initial_center[i]) 
+				- np.linalg.norm(cluster_center[i]))
+			if n0 <= 0.001:
+				exit_flag = 1
 				break
-		if exi==1:
+		if exit_flag == 1:
 			break
-		tem=np.copy(cc)											#update the centers
-	print(f"\nTotal number of iterations: {iter+1}")
+		initial_center = np.copy(cluster_center)			#update the centers
+	print(f"\nTotal number of iterations: {iteration + 1}")
+	return cluster_center
 
-	
-	return cc
-k=int(input("Enter number of clusters :"))
-inp=input("Define center values? (yes or no) : ")
-if inp.lower()=='y' or inp.lower()=='yes':
-	c=np.empty([k,2]) 
+
+k = int(input("Enter number of clusters :"))
+option = input("Define center values? (yes or no) : ")
+if option.lower() == 'y' or option.lower() == 'yes':
+	c = np.empty([k, 2]) 
 	print("{Input format: x-coordinate [space] y-coordinate}")
 	for i in range(k):
-		h1,h2=input(f"Enter x and y for center {i+1} :").split()
-		#print(type(h1))
-		c[i][0]=h1
-		c[i][1]=h2
-		#print(type(c[i][0]))
-
+		h1, h2 = input(f"Enter x and y for center {i + 1} :").split()
+		c[i][0] = h1
+		c[i][1] = h2
 else:
 	print("Random initialization chosen.")
-	c=0
+	c = 0
+cluster = mykmeans(X, k, c)
 
-cluster=mykmeans(X,k,c)
-print("\nFinal cluster centers")
+print("\nFinal cluster centers.")
 for i in range(k):
-	print(f"Cluster {i+1} center: x={cluster[i][0]}  y={cluster[i][1]}")
-print
-plt.scatter(cluster[:,0], cluster[:,1],  color= "red",marker= "+", s=200,label="Cluster Center")
+	print(f"Cluster {i + 1} center: x = {cluster[i][0]}  y = {cluster[i][1]}")
+plt.scatter(cluster[:, 0], cluster[:, 1], color = "red", marker = "+", 
+	s = 200, label = "Cluster Center")
 plt.legend()  
 plt.show()
-#print(cluster)
-#plt.scatter(cluster[:,0], cluster[:,1], label= "stars", color= "red",marker= "*", s=30) 
-#plt.show()
-#print("\n\n\n")
