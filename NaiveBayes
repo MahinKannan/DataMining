@@ -18,12 +18,12 @@ X = np.concatenate((x, y), axis = 0).T
 Y = np.repeat(c, 500)
 
 #------------------------
-#(700,300)
-#cc=[0]
-#ccc=[1]
-#l1=np.repeat(cc,700)
-#l2=np.repeat(ccc,300)
-#Y=np.concatenate((l1,l2))
+#(700, 300)
+#cc = [0]
+#ccc = [1]
+#l1 = np.repeat(cc, 700)
+#l2 = np.repeat(ccc, 300)
+#Y = np.concatenate((l1, l2))
 #--------------------------
 
 x1, y1 = np.random.multivariate_normal(u1, cov1, 500).T
@@ -36,10 +36,12 @@ X_test = np.concatenate((x, y), axis = 0).T
 Y_test = np.repeat(c, 500)
 os.system('clear')
 	#Plot for the generated points and test set.
-#print(X,Y,X_test,Y_test)
-#print(X_test[Y_test==0,0])
-#plt.scatter(X_test[Y_test==0,0], X_test[Y_test==0,1], color= "green",marker= "*", s=30,label="Generated data")  
-#plt.scatter(X_test[Y_test==1,0], X_test[Y_test==1,1], color= "blue",marker= "+", s=30,label="Generated data") 
+#print(X, Y, X_test, Y_test)
+#print(X_test[Y_test == 0, 0])
+#plt.scatter(X_test[Y_test == 0, 0], X_test[Y_test == 0, 1]
+#	, color = "green", marker = "*", s = 30, label = "Generated data")  
+#plt.scatter(X_test[Y_test == 1, 0], X_test[Y_test == 1, 1]
+#	, color = "blue", marker = "+", s = 30, label = "Generated data") 
 #plt.show()
 
 def npdf(x, m, s):
@@ -47,7 +49,7 @@ def npdf(x, m, s):
 		* math.exp(-1 * math.pow((x - m), 2) / (2 * s * s + 1e-6)))
 
 def naive(X, Y, X_test, Y_test):
-	#print(X[Y==0,0])
+	#print(X[Y == 0, 0])
 	meanx0 = np.mean(X[Y == 0, 0], axis = 0)
 	meany0 = np.mean(X[Y == 0, 1], axis = 0)
 	meanx1 = np.mean(X[Y == 1, 0], axis = 0)
