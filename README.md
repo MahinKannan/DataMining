@@ -3,9 +3,9 @@ I didn't really document anything.
 
 
 
-1. K-means
+1. K-means clustering
 2. Kernel Density Estimation
-3. Naive Bayes classifier (ROC implementation is wrong (commented))
+3. Naive Bayes classifier 
 4. Logistic Regression  (should be perfect)
 
 
@@ -31,7 +31,7 @@ Enter x and y for center 2 :  x-value y-value
 
 
 ________________________________________________________________________________
-Running Kernel density
+Running Kernel density estimation
 
 python [pname].py
 
@@ -41,7 +41,7 @@ Enter the values asked
 Enter '1' for 1D Gaussian data or '2' for 2D data: 1 (for 1D Gaussian data) or 2 (for 2D Gaussion data)	
 Enter value for h: h (binsize)
 _______________________________________________________________________________
-Running Naive Bayes 
+Running Naive Bayes classification
 
 python [pname].py
 _______________________________________________________________________________
